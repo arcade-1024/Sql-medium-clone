@@ -1,5 +1,3 @@
-const e = require("express");
-
 class UserController {
     constructor(userModel, userService) {
         this.userService = userService;
@@ -56,6 +54,18 @@ class UserController {
             res.status(404).send({error:e})
         }
     }
+    getUserByName = async (req,res) =>{
+        const name = req.params.name
+        try{
+            const {data,error} = await this.userService.getByName(name)
+            if(error) throw error;
+            else{
+                res.send({data})
+            }
+        }catch (e) {
+            res.status(404).send({error:e})
+        }
+    }
     initializeRouter = () => {
         return {
             rootRoute: "/api/users",
@@ -65,6 +75,12 @@ class UserController {
                     method: "GET",
                     middleware: [],
                     function: this.getUser,
+                },
+                {
+                    route: "/:name",
+                    method: "GET",
+                    middleware: [],
+                    function: this.getUserByName,
                 },
                 {
                     route: "/",

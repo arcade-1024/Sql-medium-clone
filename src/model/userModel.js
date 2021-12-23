@@ -1,34 +1,32 @@
 const {DataTypes} = require("sequelize")
-
-// class UserModel extends Model {
-// }
-//
-// UserModel.init({
-//     firstName: {
-//         type: DataTypes.STRING
-//     }, lastName: {
-//         type: DataTypes.STRING
-//     }
-// }, {
-//     sequelize,
-//     modelName: 'User'
-// })
-
-class UserModel {
-    constructor(db) {
-        this.database = db
+const bcrypt = require("bcrypt");
+const db = require('../config/initalizeDb')
+const UserModel = db.define('User', {
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+    },
+    name: {
+        type: DataTypes.STRING
+    }, email: {
+        type: DataTypes.STRING,
+    }, password: {
+        type: DataTypes.STRING
     }
-
-    defineUser = () => this.database.define('User', {
-        name: {
-            type: DataTypes.STRING
-        }, email: {
-            type: DataTypes.STRING
-        }, password: {
-            type: DataTypes.STRING
+},{
+    hooks: {
+        beforeCreate: async (user) => {
+            if (user.password) {
+                user.password = await bcrypt.hash(user.password, 8);
+            }
+        },
+        beforeUpdate:async (user) => {
+            if (user.password) {
+                user.password = await bcrypt.hash(user.password,8);
+            }
         }
-    })
-
-}
+    }
+})
 
 module.exports = UserModel
